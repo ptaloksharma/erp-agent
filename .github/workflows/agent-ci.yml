@@ -32,3 +32,5 @@ jobs:
         run: |
           echo "Successfully authenticated with Azure subscription!"
           az account show
+      - name: Install agent dependencies
+          run: pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest -r requirements.txt
