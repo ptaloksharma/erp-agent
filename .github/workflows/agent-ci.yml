@@ -16,9 +16,7 @@ jobs:
           cd /tmp/dm-agent-kit && npm install && npm run build
           
       - name: Install agent dependencies
-        run: |
-          pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest -r requirements.txt
-          cd /tmp/dm-agent-kit && pip install -e .
+        run: pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest -r requirements.txt
         
       - name: Securi test gate
         run: cd /tmp/dm-agent-kit && PYTHONPATH=src python -m pytest python/tests python/tests_securi -q
