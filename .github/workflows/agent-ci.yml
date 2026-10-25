@@ -45,11 +45,10 @@ jobs:
         env:
           AZURE_CREDS_JSON: ${{ secrets.AZURE_CREDENTIALS }}
         run: |
-          CLEAN_JSON=$(echo "$AZURE_CREDS_JSON" | sed 's/\xc2\xa0/ /g')
-          CLIENT_ID=$(echo "$CLEAN_JSON" | jq -r '.clientId // .appId')
-          CLIENT_SECRET=$(echo "$CLEAN_JSON" | jq -r '.clientSecret // .password')
-          TENANT_ID=$(echo "$CLEAN_JSON" | jq -r '.tenantId // .tenant')
-          SUBSCRIPTION_ID=$(echo "$CLEAN_JSON" | jq -r '.subscriptionId // empty')
+          CLIENT_ID=$(echo "$AZURE_CREDS_JSON" | jq -r '.clientId')
+          CLIENT_SECRET=$(echo "$AZURE_CREDS_JSON" | jq -r '.clientSecret')
+          TENANT_ID=$(echo "$AZURE_CREDS_JSON" | jq -r '.tenantId')
+          SUBSCRIPTION_ID=$(echo "$AZURE_CREDS_JSON" | jq -r '.subscriptionId')
 
           echo "::add-mask::$CLIENT_SECRET"
           echo "AZURE_CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
