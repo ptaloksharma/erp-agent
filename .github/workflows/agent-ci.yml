@@ -9,28 +9,35 @@ jobs:
         with: {python-version: '3.11'}
       - uses: actions/setup-node@v4
         with: {node-version: '20'}
+      
       - name: Install dm-agent-kit (Securi CLI)
         run: |
           git clone https://github.com/ptaloksharma/dm-agent-kit.git /tmp/dm-agent-kit
           cd /tmp/dm-agent-kit && npm install && npm run build
+          
       - name: Install agent dependencies
-        run: pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets -r requirements.txt
+        run: pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest -r requirements.txt
+        
       - name: Securi test gate
         run: cd /tmp/dm-agent-kit && PYTHONPATH=src python -m pytest python/tests python/tests_securi -q
+        
       - name: Securi CI gate (BOLA/PII/loop-guard scan)
         run: node /tmp/dm-agent-kit/dist/cli/index.js securi ci-gate --path .
+        
       - name: Agent self-check
         run: python agent.py
 
-      # --- NEW AZURE DEPLOYMENT & AUTH STEPS ---
       - name: Log in to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Verify Azure Cloud Connection
+        env:
+          COSMOS_ENDPOINT: ${{ secrets.COSMOS_ENDPOINT }}
+          KEYVAULT_URL: ${{ secrets.KEYVAULT_URL }}
         run: |
           echo "Successfully authenticated with Azure subscription!"
+          echo "Cosmos DB Endpoint: $COSMOS_ENDPOINT"
+          echo "Key Vault URL: $KEYVAULT_URL"
           az account show
-      - name: Install agent dependencies
-          run: pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest -r requirements.txt
