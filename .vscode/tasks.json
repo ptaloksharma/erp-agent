@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "\u25b6 Run this agent",
+      "type": "shell",
+      "command": "python agent.py",
+      "problemMatcher": []
+    },
+    {
+      "label": "\ud83d\udd78\ufe0f Test mesh handoff from coordinator",
+      "type": "shell",
+      "command": "python ../../agents/$(coordinator)/agent.py",
+      "problemMatcher": []
+    }
+  ]
+}

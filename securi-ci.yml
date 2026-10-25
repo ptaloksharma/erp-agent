@@ -1,0 +1,23 @@
+name: Securi CI
+on: [push, pull_request]
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20'}
+      - name: Install dm-agent-kit (Securi CLI)
+        run: |
+          git clone https://github.com/ptaloksharma/dm-agent-kit.git /tmp/dm-agent-kit
+          cd /tmp/dm-agent-kit && npm install && npm run build
+      - name: Install agent dependencies
+        run: pip install PyJWT pydantic structlog cryptography -r requirements.txt
+      - name: Securi test gate
+        run: cd /tmp/dm-agent-kit && PYTHONPATH=src python -m pytest python/tests python/tests_securi -q
+      - name: Securi CI gate (BOLA/PII/loop-guard scan)
+        run: node /tmp/dm-agent-kit/dist/cli/index.js securi ci-gate --path .
+      - name: Agent self-check
+        run: python agent.py

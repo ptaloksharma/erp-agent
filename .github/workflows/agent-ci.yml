@@ -1,41 +1,56 @@
 name: Securi CI
 on: [push, pull_request]
+
 jobs:
   gate:
     runs-on: ubuntu-latest
+    env:
+      COSMOS_ENDPOINT: ${{ secrets.COSMOS_ENDPOINT }}
+      KEYVAULT_URL: ${{ secrets.KEYVAULT_URL }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
-        with: {python-version: '3.11'}
+        with:
+          python-version: '3.11'
+
       - uses: actions/setup-node@v4
-        with: {node-version: '20'}
-      
+        with:
+          node-version: '20'
+
       - name: Install dm-agent-kit (Securi CLI)
         run: |
           git clone https://github.com/ptaloksharma/dm-agent-kit.git /tmp/dm-agent-kit
           cd /tmp/dm-agent-kit && npm install && npm run build
-          
-      - name: Install agent dependencies
-        run: pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest -r requirements.txt
-        
+
+      - name: Install agent and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PyJWT pydantic structlog cryptography azure-identity azure-cosmos azure-keyvault-secrets pytest pytest-asyncio langgraph faker spacy httpx -r requirements.txt
+          python -m spacy download en_core_web_sm
+          if [ -f /tmp/dm-agent-kit/requirements.txt ]; then pip install -r /tmp/dm-agent-kit/requirements.txt; fi
+          if [ -f /tmp/dm-agent-kit/python/requirements.txt ]; then pip install -r /tmp/dm-agent-kit/python/requirements.txt; fi
+          if [ -f /tmp/dm-agent-kit/python/pyproject.toml ] || [ -f /tmp/dm-agent-kit/python/setup.py ]; then pip install -e /tmp/dm-agent-kit/python; fi
+
       - name: Securi test gate
-        run: cd /tmp/dm-agent-kit && PYTHONPATH=src python -m pytest python/tests python/tests_securi -q
-        
+        run: |
+          cd /tmp/dm-agent-kit
+          PYTHONPATH=/tmp/dm-agent-kit/python:/tmp/dm-agent-kit/src:/tmp/dm-agent-kit python -m pytest python/tests_securi python/tests -q
+
       - name: Securi CI gate (BOLA/PII/loop-guard scan)
         run: node /tmp/dm-agent-kit/dist/cli/index.js securi ci-gate --path .
-        
-      - name: Agent self-check
-        run: python agent.py
 
       - name: Log in to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Agent self-check
+        run: |
+          PYTHONPATH=.:/tmp/dm-agent-kit/python:/tmp/dm-agent-kit/src python agent.py
+
       - name: Verify Azure Cloud Connection
-        env:
-          COSMOS_ENDPOINT: ${{ secrets.COSMOS_ENDPOINT }}
-          KEYVAULT_URL: ${{ secrets.KEYVAULT_URL }}
         run: |
           echo "Successfully authenticated with Azure subscription!"
           echo "Cosmos DB Endpoint: $COSMOS_ENDPOINT"

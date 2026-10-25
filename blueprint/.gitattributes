@@ -1,0 +1,8 @@
+# AI-generated blueprint docs: never merge-conflict with human strategy.
+# Resolve generated files using the repo's version (ours) on pull.
+01-PRD.md merge=ours
+02-TRD.md merge=ours
+03-APP_FLOW.md merge=ours
+04-UI_UX_DESIGN.md merge=ours
+05-BACKEND_SCHEMA.md merge=ours
+06-IMPLEMENTATION_PLAN.md merge=ours

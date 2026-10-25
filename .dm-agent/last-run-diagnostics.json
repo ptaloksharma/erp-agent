@@ -1,0 +1,24 @@
+{
+  "schema": "dm-friendly-police/v1",
+  "env": "production",
+  "events": [
+    {
+      "type": "pass",
+      "tool": "echo",
+      "step": null,
+      "timestamp": 1792936867.900446
+    },
+    {
+      "type": "pass",
+      "tool": "classify_intent",
+      "step": null,
+      "timestamp": 1792936868.015399
+    },
+    {
+      "type": "pass",
+      "tool": "delegate_to_domain_agent",
+      "step": null,
+      "timestamp": 1792936868.1016824
+    }
+  ]
+}

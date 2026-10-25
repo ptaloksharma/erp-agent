@@ -1,0 +1,18 @@
+# GOAL.yaml - compiled from intent.txt
+objective: 'Evaluates enterprise payloads for risk profiles and compliance thresholds securely.'
+tier: fast-path
+role: ui-coordinator
+delegation:
+  allowedTargets: [domain-agent]
+  allowedCallers: []
+  acceptsExternal: true
+  directTools: false
+allowedTools:
+  - classify_intent
+  - delegate_to_domain_agent
+  - evaluate_risk_profile
+budgets:
+  maxSteps: 15
+  maxTokens: 100000
+multi_tenant: false
+egressAllow: []

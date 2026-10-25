@@ -1,0 +1,10 @@
+# Intent - erp-agent
+> status: human-authored
+> Edit this file, then recompile. GOAL.yaml is generated.
+
+Objective: Routes enterprise ERP user requests securely down the mesh and delegates domain tasks to specialized agents.
+Tier: fast-path
+AllowedTools: classify_intent, delegate_to_domain_agent
+Budgets:
+  maxSteps: 15
+  maxTokens: 100000
