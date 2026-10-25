@@ -45,6 +45,11 @@ jobs:
         env:
           AZURE_CREDS_JSON: ${{ secrets.AZURE_CREDENTIALS }}
         run: |
+          if [ -z "$AZURE_CREDS_JSON" ]; then
+            echo "ERROR: AZURE_CREDENTIALS secret is not available to the step."
+            exit 1
+          fi
+
           CLIENT_ID=$(echo "$AZURE_CREDS_JSON" | jq -r '.clientId')
           CLIENT_SECRET=$(echo "$AZURE_CREDS_JSON" | jq -r '.clientSecret')
           TENANT_ID=$(echo "$AZURE_CREDS_JSON" | jq -r '.tenantId')
