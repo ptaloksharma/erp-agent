@@ -7,6 +7,7 @@ jobs:
     env:
       COSMOS_ENDPOINT: ${{ secrets.COSMOS_ENDPOINT }}
       KEYVAULT_URL: ${{ secrets.KEYVAULT_URL }}
+      AZURE_CREDS_JSON: ${{ secrets.AZURE_CREDENTIALS }}
 
     steps:
       - uses: actions/checkout@v4
@@ -42,11 +43,9 @@ jobs:
         run: node /tmp/dm-agent-kit/dist/cli/index.js securi ci-gate --path .
 
       - name: Log in to Azure
-        env:
-          AZURE_CREDS_JSON: ${{ secrets.AZURE_CREDENTIALS }}
         run: |
           if [ -z "$AZURE_CREDS_JSON" ]; then
-            echo "ERROR: AZURE_CREDENTIALS secret is not available to the step."
+            echo "ERROR: AZURE_CREDENTIALS secret is not available."
             exit 1
           fi
 
